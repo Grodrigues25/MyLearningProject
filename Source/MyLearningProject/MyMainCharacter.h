@@ -28,23 +28,26 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputMappingContext* InputMapping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* MovementAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* JumpAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enhanced Input")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* CrouchAction;
 
 public:	
 
 	bool bAttacking;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Movement")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	float CharacterMovementSpeed;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
 
 	// Called every frame
@@ -54,18 +57,18 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Camera Boom positioning the camera behind the player
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* CameraBoom;
 
 	// Follow Camera
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* FollowCamera;
 
 	// Base turn rates to scale turning functions for the Camera
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
 		float BaseTurnRate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
 		float BaseLookUpRate;
 
 	void Move(const FInputActionValue& value);
