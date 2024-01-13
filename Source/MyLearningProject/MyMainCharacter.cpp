@@ -15,9 +15,18 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
+// TODO: Understand why the crouching movement speed sums up when going diagonally and correct it
+
 // Sets default values
 AMyMainCharacter::AMyMainCharacter()
 {
+	// Bools related to Character Movement
+	bAttacking = false;
+	bCrouching = false;
+
+	// Character Movement Speeds
+	CharacterMovementSpeed = 540.f;
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -46,12 +55,9 @@ AMyMainCharacter::AMyMainCharacter()
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, CharacterMovementSpeed, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 650.f;
 	GetCharacterMovement()->AirControl = 0.2f;
-
-	bAttacking = false;
-	bCrouching = false;
 
 	// Set size for colision capsule
 	GetCapsuleComponent()->SetCapsuleSize(30.f, 95.f);
@@ -101,16 +107,26 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 {
 	const FVector2D MovementVector = value.Get<FVector2D>();
 
-	if ((Controller != nullptr) && (!bAttacking))
+	if (Controller != nullptr)
 	{
 		// Find out which way is forward
 		const FRotator rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0.f, rotation.Yaw, 0.f);
 
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(ForwardDirection, MovementVector.Y);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+
+		if (bCrouching) {
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
+			
+		}
+		else 
+		{
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
+		}
+		
 	}
 }
 
@@ -125,11 +141,14 @@ void AMyMainCharacter::Look(const FInputActionValue& value)
 void AMyMainCharacter::Crouch()
 {
 	if (!bCrouching) {
+		
 		bCrouching = true;
+
 	}
 	else
 	{
 		bCrouching = false;
+
 	}
 	
 }
