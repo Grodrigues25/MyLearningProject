@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "MyMainCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -25,7 +24,7 @@ AMyMainCharacter::AMyMainCharacter()
 	bCrouching = false;
 
 	// Character Movement Speeds
-	CharacterMovementSpeed = 540.f;
+	CharacterMovementSpeed = 1100.f;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -55,7 +54,7 @@ AMyMainCharacter::AMyMainCharacter()
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, CharacterMovementSpeed, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 650.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
@@ -116,10 +115,22 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
+		// TODO: Find solution for the movement to be at the same speed in all directions. Use sin(MovementVector*2PI) ?
+		
+		// Log which direction is forward
+		UE_LOG(LogTemp, Warning, TEXT("Forward Direction value: %f, %f, %f"), ForwardDirection.X, ForwardDirection.Y, ForwardDirection.Z);
+		UE_LOG(LogTemp, Warning, TEXT("Right Direction value: %f, %f, %f"), RightDirection.X, RightDirection.Y, RightDirection.Z);
+
+		FVector2D NormalizedMovementVector;
+		NormalizedMovementVector.X = sin(MovementVector.X / (abs(MovementVector.X) + abs(MovementVector.Y));
+		NormalizedMovementVector.Y = MovementVector.Y / (abs(MovementVector.X) + abs(MovementVector.Y));
+
+		// Log movement input
+		UE_LOG(LogTemp, Warning, TEXT("Movement input value: %f, %f"), NormalizedMovementVector.X, NormalizedMovementVector.Y);
+
 		if (bCrouching) {
-			AddMovementInput(ForwardDirection, MovementVector.Y);
-			AddMovementInput(RightDirection, MovementVector.X);
-			
+			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y);
+			AddMovementInput(RightDirection, NormalizedMovementVector.X);
 		}
 		else 
 		{
