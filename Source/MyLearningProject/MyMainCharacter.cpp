@@ -104,7 +104,11 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 // Called for forward/backward input
 void AMyMainCharacter::Move(const FInputActionValue& value)
 {
+	// Get movement vector from the input and then normalize it to make its magnitude 1 in all directions
+	// This avoids faster movement diagonally
+
 	const FVector2D MovementVector = value.Get<FVector2D>();
+	const FVector2D NormalizedMovementVector = MovementVector / MovementVector.Length();
 
 	if (Controller != nullptr)
 	{
@@ -115,27 +119,14 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// TODO: Find solution for the movement to be at the same speed in all directions. Use sin(MovementVector*2PI) ?
-		
-		// Log which direction is forward
-		UE_LOG(LogTemp, Warning, TEXT("Forward Direction value: %f, %f, %f"), ForwardDirection.X, ForwardDirection.Y, ForwardDirection.Z);
-		UE_LOG(LogTemp, Warning, TEXT("Right Direction value: %f, %f, %f"), RightDirection.X, RightDirection.Y, RightDirection.Z);
-
-		FVector2D NormalizedMovementVector;
-		NormalizedMovementVector.X = sin(MovementVector.X / (abs(MovementVector.X) + abs(MovementVector.Y));
-		NormalizedMovementVector.Y = MovementVector.Y / (abs(MovementVector.X) + abs(MovementVector.Y));
-
-		// Log movement input
-		UE_LOG(LogTemp, Warning, TEXT("Movement input value: %f, %f"), NormalizedMovementVector.X, NormalizedMovementVector.Y);
-
 		if (bCrouching) {
-			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y);
-			AddMovementInput(RightDirection, NormalizedMovementVector.X);
+			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y/2);
+			AddMovementInput(RightDirection, NormalizedMovementVector.X/2);
 		}
 		else 
 		{
-			AddMovementInput(ForwardDirection, MovementVector.Y);
-			AddMovementInput(RightDirection, MovementVector.X);
+			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y);
+			AddMovementInput(RightDirection, NormalizedMovementVector.X);
 		}
 		
 	}
