@@ -22,6 +22,7 @@ AMyMainCharacter::AMyMainCharacter()
 	// Bools related to Character Movement
 	bAttacking = false;
 	bCrouching = false;
+	bSprinting = false;
 
 	// Character Movement Speeds
 	CharacterMovementSpeed = 1100.f;
@@ -97,6 +98,7 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Crouch);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Sprint);
 	}
 
 }
@@ -123,10 +125,14 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y/2);
 			AddMovementInput(RightDirection, NormalizedMovementVector.X/2);
 		}
+		else if (bSprinting) {
+			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y * 2);
+			AddMovementInput(RightDirection, NormalizedMovementVector.X * 2);
+		}
 		else 
 		{
-			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y);
-			AddMovementInput(RightDirection, NormalizedMovementVector.X);
+			AddMovementInput(ForwardDirection, MovementVector.Y);
+			AddMovementInput(RightDirection, MovementVector.X);
 		}
 		
 	}
@@ -144,6 +150,7 @@ void AMyMainCharacter::Crouch()
 {
 	if (!bCrouching) {
 		
+		bSprinting = false;
 		bCrouching = true;
 
 	}
@@ -153,6 +160,21 @@ void AMyMainCharacter::Crouch()
 
 	}
 	
+}
+
+void AMyMainCharacter::Sprint()
+{
+	if (!bSprinting) {
+
+		bCrouching = false;
+		bSprinting = true;
+
+	}
+	else
+	{
+		bSprinting = false;
+
+	}
 }
 
 

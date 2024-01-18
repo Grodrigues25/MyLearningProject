@@ -39,5 +39,6 @@ void UMyMainAnimInstance::UpdateAnimationProperties()
 		}
 		
 		bIsCrouching = Main->bCrouching;
+		bIsSprinting = Main->bSprinting;
 	}
 }

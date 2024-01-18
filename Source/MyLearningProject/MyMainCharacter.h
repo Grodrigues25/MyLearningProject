@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* CrouchAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
+	UInputAction* SprintAction;
+
 public:	
 
 	bool bAttacking;
@@ -49,6 +52,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bSprinting;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -76,4 +82,6 @@ public:
 	void Look(const FInputActionValue& value);
 
 	void Crouch();
+
+	void Sprint();
 };
