@@ -30,6 +30,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Movement")
 	bool bIsCrouching;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Movement")
+	bool bIsSprinting;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	class APawn* Pawn;
 
