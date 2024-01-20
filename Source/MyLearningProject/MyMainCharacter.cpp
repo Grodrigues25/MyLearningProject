@@ -58,6 +58,7 @@ AMyMainCharacter::AMyMainCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 650.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 
 	// Set size for colision capsule
 	GetCapsuleComponent()->SetCapsuleSize(30.f, 95.f);
@@ -98,7 +99,9 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Crouch);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Sprint);
+
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::Sprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::Sprint);
 	}
 
 }
@@ -108,7 +111,6 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 {
 	// Get movement vector from the input and then normalize it to make its magnitude 1 in all directions
 	// This avoids faster movement diagonally
-
 	const FVector2D MovementVector = value.Get<FVector2D>();
 	const FVector2D NormalizedMovementVector = MovementVector / MovementVector.Length();
 
@@ -121,19 +123,19 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		if (bCrouching) {
-			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y/2);
-			AddMovementInput(RightDirection, NormalizedMovementVector.X/2);
-		}
-		else if (bSprinting) {
-			AddMovementInput(ForwardDirection, NormalizedMovementVector.Y * 2);
-			AddMovementInput(RightDirection, NormalizedMovementVector.X * 2);
-		}
-		else 
-		{
-			AddMovementInput(ForwardDirection, MovementVector.Y);
-			AddMovementInput(RightDirection, MovementVector.X);
-		}
+		//if (bCrouching) {
+		//	AddMovementInput(ForwardDirection, NormalizedMovementVector.Y/2);
+		//	AddMovementInput(RightDirection, NormalizedMovementVector.X/2);
+		//}
+		//else if (bSprinting) {
+		//	AddMovementInput(ForwardDirection, NormalizedMovementVector.Y * 2);
+		//	AddMovementInput(RightDirection, NormalizedMovementVector.X * 2);
+		//}
+		//else 
+		//{
+		AddMovementInput(ForwardDirection, NormalizedMovementVector.Y);
+		AddMovementInput(RightDirection, NormalizedMovementVector.X);
+		//}
 		
 	}
 }
@@ -152,12 +154,13 @@ void AMyMainCharacter::Crouch()
 		
 		bSprinting = false;
 		bCrouching = true;
-
+		
+		GetCharacterMovement()->MaxWalkSpeed = 200.f;
 	}
 	else
 	{
 		bCrouching = false;
-
+		GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	}
 	
 }
@@ -168,12 +171,12 @@ void AMyMainCharacter::Sprint()
 
 		bCrouching = false;
 		bSprinting = true;
-
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	}
 	else
 	{
 		bSprinting = false;
-
+		GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	}
 }
 
