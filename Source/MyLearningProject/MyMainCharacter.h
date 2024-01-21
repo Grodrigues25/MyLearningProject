@@ -7,6 +7,17 @@
 #include "InputActionValue.h"
 #include "MyMainCharacter.generated.h"
 
+UENUM(BlueprintType)
+enum class EMovementStatus : uint8
+{
+	EMS_Walking UMETA(DisplayName = "Walking"),
+	EMS_Sprinting UMETA(DisplayName = "Sprinting"),
+	EMS_Crouching UMETA(DisplayName = "Crouching"),
+	EMS_Dodging UMETA(DisplayName = "Dodging"),
+
+	EMS_Max UMETA(DisplayName = "DefaultMax")
+};
+
 class UInputMappingContext;
 class UInputAction;
 
@@ -19,12 +30,14 @@ public:
 	// Sets default values for this character's properties
 	AMyMainCharacter();
 
-	//virtual void Jump() override;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	EMovementStatus MovementStatus;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Input Mappings and Actions for input configuration
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputMappingContext* InputMapping;
 
@@ -49,6 +62,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	float CharacterMovementSpeed;
+
+
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
