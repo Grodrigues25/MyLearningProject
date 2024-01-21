@@ -24,6 +24,8 @@ AMyMainCharacter::AMyMainCharacter()
 	bCrouching = false;
 	bSprinting = false;
 
+	MovementStatus = EMovementStatus::EMS_Walking;
+
 	// Character Movement Speeds
 	CharacterMovementSpeed = 1100.f;
 
@@ -61,7 +63,7 @@ AMyMainCharacter::AMyMainCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 
 	// Set size for colision capsule
-	GetCapsuleComponent()->SetCapsuleSize(30.f, 95.f);
+	GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
 
 }
 
@@ -123,19 +125,8 @@ void AMyMainCharacter::Move(const FInputActionValue& value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		//if (bCrouching) {
-		//	AddMovementInput(ForwardDirection, NormalizedMovementVector.Y/2);
-		//	AddMovementInput(RightDirection, NormalizedMovementVector.X/2);
-		//}
-		//else if (bSprinting) {
-		//	AddMovementInput(ForwardDirection, NormalizedMovementVector.Y * 2);
-		//	AddMovementInput(RightDirection, NormalizedMovementVector.X * 2);
-		//}
-		//else 
-		//{
 		AddMovementInput(ForwardDirection, NormalizedMovementVector.Y);
 		AddMovementInput(RightDirection, NormalizedMovementVector.X);
-		//}
 		
 	}
 }
@@ -152,15 +143,23 @@ void AMyMainCharacter::Crouch()
 {
 	if (!bCrouching) {
 		
+		MovementStatus = EMovementStatus::EMS_Crouching;
+
 		bSprinting = false;
 		bCrouching = true;
 		
 		GetCharacterMovement()->MaxWalkSpeed = 200.f;
+		GetCapsuleComponent()->SetCapsuleSize(40.f, 70.f);
+		// TODO: Find out why the character goes into the ground when crouching
+		
 	}
 	else
 	{
+		MovementStatus = EMovementStatus::EMS_Walking;
+
 		bCrouching = false;
 		GetCharacterMovement()->MaxWalkSpeed = 400.f;
+		GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
 	}
 	
 }
@@ -169,12 +168,17 @@ void AMyMainCharacter::Sprint()
 {
 	if (!bSprinting) {
 
+		MovementStatus = EMovementStatus::EMS_Sprinting;
+
 		bCrouching = false;
 		bSprinting = true;
-		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		GetCharacterMovement()->MaxWalkSpeed = 700.f;
 	}
 	else
 	{
+
+		MovementStatus = EMovementStatus::EMS_Walking;
+
 		bSprinting = false;
 		GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	}
