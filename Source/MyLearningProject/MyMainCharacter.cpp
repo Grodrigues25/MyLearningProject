@@ -23,6 +23,8 @@ AMyMainCharacter::AMyMainCharacter()
 	bAttacking = false;
 	bCrouching = false;
 	bSprinting = false;
+	bHasDoubleJumped = false;
+	bIsInAir = false;
 
 	MovementStatus = EMovementStatus::EMS_Walking;
 
@@ -35,7 +37,7 @@ AMyMainCharacter::AMyMainCharacter()
 	// Create Camera Boom (pulls towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 600.f; // Camera follows at a distance
+	CameraBoom->TargetArmLength = 400.f; // Camera follows at a distance
 	CameraBoom->bUsePawnControlRotation = true; // Rotate arm based on controller
 
 	// Create follow camera
@@ -99,7 +101,9 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Look);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AMyMainCharacter::DoubleJump);
+
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Crouch);
 
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::Sprint);
@@ -150,7 +154,9 @@ void AMyMainCharacter::Crouch()
 		
 		GetCharacterMovement()->MaxWalkSpeed = 200.f;
 		GetCapsuleComponent()->SetCapsuleSize(40.f, 70.f);
-		// TODO: Find out why the character goes into the ground when crouching
+
+		FVector MeshLocation(0.f, 5.f, -72.5f);
+		GetMesh()->SetRelativeLocation(MeshLocation); 
 		
 	}
 	else
@@ -160,6 +166,9 @@ void AMyMainCharacter::Crouch()
 		bCrouching = false;
 		GetCharacterMovement()->MaxWalkSpeed = 400.f;
 		GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
+
+		FVector MeshLocation(0.f, 5.f, -90.5f);
+		GetMesh()->SetRelativeLocation(MeshLocation);
 	}
 	
 }
@@ -172,7 +181,7 @@ void AMyMainCharacter::Sprint()
 
 		bCrouching = false;
 		bSprinting = true;
-		GetCharacterMovement()->MaxWalkSpeed = 700.f;
+		GetCharacterMovement()->MaxWalkSpeed = 950.f;
 	}
 	else
 	{
@@ -184,4 +193,16 @@ void AMyMainCharacter::Sprint()
 	}
 }
 
-
+void AMyMainCharacter::DoubleJump()
+{
+	if (!(GetMovementComponent()->IsFalling()))
+	{
+		ACharacter::Jump();
+		bHasDoubleJumped = false;
+	}
+	else if(GetMovementComponent()->IsFalling() && !bHasDoubleJumped)
+	{
+		ACharacter::Jump();
+		bHasDoubleJumped = true;
+	}
+}

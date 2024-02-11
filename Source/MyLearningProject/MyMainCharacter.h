@@ -63,13 +63,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	float CharacterMovementSpeed;
 
-
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bSprinting;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bIsInAir;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bHasDoubleJumped;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -79,18 +83,18 @@ public:
 
 	// Camera Boom positioning the camera behind the player
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* CameraBoom;
+	class USpringArmComponent* CameraBoom;
 
 	// Follow Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* FollowCamera;
+	class UCameraComponent* FollowCamera;
 
 	// Base turn rates to scale turning functions for the Camera
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
-		float BaseTurnRate;
+	float BaseTurnRate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
-		float BaseLookUpRate;
+	float BaseLookUpRate;
 
 	void Move(const FInputActionValue& value);
 
@@ -99,4 +103,6 @@ public:
 	void Crouch();
 
 	void Sprint();
+
+	void DoubleJump();
 };
