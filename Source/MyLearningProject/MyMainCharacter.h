@@ -56,6 +56,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* SprintAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
+	UInputAction* DodgeAction;
+
 public:	
 
 	bool bAttacking;
@@ -74,6 +77,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bHasDoubleJumped;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bIsDodging;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -105,4 +111,6 @@ public:
 	void Sprint();
 
 	void DoubleJump();
+
+	void Dodge();
 };

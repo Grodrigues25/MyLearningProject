@@ -25,6 +25,7 @@ AMyMainCharacter::AMyMainCharacter()
 	bSprinting = false;
 	bHasDoubleJumped = false;
 	bIsInAir = false;
+	bIsDodging = false;
 
 	MovementStatus = EMovementStatus::EMS_Walking;
 
@@ -108,6 +109,9 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::Sprint);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::Sprint);
+
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Dodge);
+		
 	}
 
 }
@@ -204,5 +208,13 @@ void AMyMainCharacter::DoubleJump()
 	{
 		ACharacter::Jump();
 		bHasDoubleJumped = true;
+	}
+}
+
+void AMyMainCharacter::Dodge()
+{
+	if (!bIsDodging)
+	{
+		bIsDodging = true;
 	}
 }

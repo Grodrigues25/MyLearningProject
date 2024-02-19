@@ -36,6 +36,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
 	bool bAnimHasDoubleJumped;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
+	bool bHasDodged;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	class APawn* Pawn;
 
