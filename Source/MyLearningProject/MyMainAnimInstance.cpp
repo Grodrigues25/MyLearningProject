@@ -41,6 +41,6 @@ void UMyMainAnimInstance::UpdateAnimationProperties()
 		bIsCrouching = Main->bCrouching;
 		bIsSprinting = Main->bSprinting;
 		bAnimHasDoubleJumped = Main->bHasDoubleJumped;
-		bHasDodged = Main->bIsDodging;
+		bHasDodged = Main->bPressedDodge;
 	}
 }

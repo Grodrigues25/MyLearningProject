@@ -25,7 +25,7 @@ AMyMainCharacter::AMyMainCharacter()
 	bSprinting = false;
 	bHasDoubleJumped = false;
 	bIsInAir = false;
-	bIsDodging = false;
+	bPressedDodge = false;
 
 	MovementStatus = EMovementStatus::EMS_Walking;
 
@@ -110,8 +110,8 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::Sprint);
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::Sprint);
 
-		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Dodge);
-		
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::DodgeKeyDown);
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::DodgeKeyUp);
 	}
 
 }
@@ -211,10 +211,20 @@ void AMyMainCharacter::DoubleJump()
 	}
 }
 
-void AMyMainCharacter::Dodge()
+void AMyMainCharacter::DodgeKeyDown()
 {
-	if (!bIsDodging)
-	{
-		bIsDodging = true;
-	}
+	bPressedDodge = true;
+	//if (!bPressedDodge)
+	//{
+	//	bPressedDodge = true;
+	//}
+	//else
+	//{
+	//	bPressedDodge = false;
+	//}
+}
+
+void AMyMainCharacter::DodgeKeyUp()
+{
+	bPressedDodge = false;
 }
