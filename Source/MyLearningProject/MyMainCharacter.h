@@ -79,7 +79,7 @@ public:
 	bool bHasDoubleJumped;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bIsDodging;
+	bool bPressedDodge;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -112,5 +112,7 @@ public:
 
 	void DoubleJump();
 
-	void Dodge();
+	void DodgeKeyDown();
+
+	void DodgeKeyUp();
 };
