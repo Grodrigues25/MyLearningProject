@@ -33,6 +33,66 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	EMovementStatus MovementStatus;
 
+	// Variables related to character stats and metrics
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	float CharacterMovementSpeed;
+
+	// Character related bools used for gameplay mechanics
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bCrouching;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bSprinting;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bIsInAir;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bHasDoubleJumped;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
+	bool bPressedDodge;
+
+	bool bAttacking;
+
+	// Camera settings
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// Camera Boom positioning the camera behind the player
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+
+	// Follow Camera
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* FollowCamera;
+
+	// Base turn rates to scale turning functions for the Camera
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
+	float BaseTurnRate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
+	float BaseLookUpRate;
+
+
+	// Functions
+	void Move(const FInputActionValue& value);
+
+	void Look(const FInputActionValue& value);
+
+	void Crouch();
+
+	void Sprint();
+
+	void DoubleJump();
+
+	void DodgeKeyDown();
+
+	void DodgeKeyUp();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -58,61 +118,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Custom Property -> Enhanced Input")
 	UInputAction* DodgeAction;
-
-public:	
-
-	bool bAttacking;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	float CharacterMovementSpeed;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bCrouching;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bSprinting;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bIsInAir;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bHasDoubleJumped;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bPressedDodge;
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// Camera Boom positioning the camera behind the player
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
-	// Follow Camera
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera", meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
-
-	// Base turn rates to scale turning functions for the Camera
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
-	float BaseTurnRate;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Custom Property -> Camera")
-	float BaseLookUpRate;
-
-	void Move(const FInputActionValue& value);
-
-	void Look(const FInputActionValue& value);
-
-	void Crouch();
-
-	void Sprint();
-
-	void DoubleJump();
-
-	void DodgeKeyDown();
-
-	void DodgeKeyUp();
 };
