@@ -37,6 +37,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	float CharacterMovementSpeed;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
+	float MaxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	float Health;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
+	float MaxStamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	float Stamina;
+
 	// Character related bools used for gameplay mechanics
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
@@ -92,6 +104,11 @@ public:
 	void DodgeKeyDown();
 
 	void DodgeKeyUp();
+
+	void DecrementHealth(float Amount);
+
+	void Die();
+
 
 protected:
 	// Called when the game starts or when spawned

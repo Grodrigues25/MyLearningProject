@@ -29,8 +29,12 @@ AMyMainCharacter::AMyMainCharacter()
 
 	MovementStatus = EMovementStatus::EMS_Walking;
 
-	// Character Movement Speeds
+	// Character Stats Variables
 	CharacterMovementSpeed = 1100.f;
+	MaxHealth = 100.f;
+	Health = 80.f;
+	MaxStamina = 200.f;
+	Stamina = 100.f;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -89,6 +93,15 @@ void AMyMainCharacter::BeginPlay()
 void AMyMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bSprinting && Stamina >= 0)
+	{
+		Stamina -= 30 * DeltaTime;
+	}
+	else if (Stamina < MaxStamina)
+	{
+		Stamina += 10 * DeltaTime;
+	}
 
 }
 
@@ -179,13 +192,19 @@ void AMyMainCharacter::Crouch()
 
 void AMyMainCharacter::Sprint()
 {
-	if (!bSprinting) {
+	if (!bSprinting && Stamina > 0) {
 
 		MovementStatus = EMovementStatus::EMS_Sprinting;
 
 		bCrouching = false;
 		bSprinting = true;
 		GetCharacterMovement()->MaxWalkSpeed = 950.f;
+
+		if (Stamina <= 0) {
+			bSprinting = false;
+			GetCharacterMovement()->MaxWalkSpeed = 400.f;
+		}
+
 	}
 	else
 	{
@@ -227,4 +246,22 @@ void AMyMainCharacter::DodgeKeyDown()
 void AMyMainCharacter::DodgeKeyUp()
 {
 	bPressedDodge = false;
+}
+
+void AMyMainCharacter::DecrementHealth(float Amount)
+{
+	if (Health - Amount <= 0.f)
+	{
+		Die();
+	}
+	else
+	{
+		Health -= Amount;
+	}
+	
+}
+
+void AMyMainCharacter::Die()
+{
+
 }
