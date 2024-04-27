@@ -20,21 +20,30 @@
 AMyMainCharacter::AMyMainCharacter()
 {
 	// Bools related to Character Movement
+	bShiftKeyDown = false;
 	bAttacking = false;
 	bCrouching = false;
-	bSprinting = false;
 	bHasDoubleJumped = false;
 	bIsInAir = false;
 	bPressedDodge = false;
 
+	// Enums
 	MovementStatus = EMovementStatus::EMS_Walking;
+	StaminaStatus = EStaminaStatus::ESS_Normal;
 
-	// Character Stats Variables
-	CharacterMovementSpeed = 1100.f;
+	/// Character Stats Variables
+	// MovementSpeeds
+	SprintingSpeed = 950.f;
+	WalkingSpeed = 400.f;
+	CrouchingSpeed = 200.f;
+
+	// Health and Stamina
 	MaxHealth = 100.f;
 	Health = 80.f;
 	MaxStamina = 200.f;
 	Stamina = 100.f;
+	StaminaDrainRate = 25.f;
+	MinSprintStamina = 50.f;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -94,15 +103,101 @@ void AMyMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bSprinting && Stamina >= 0)
-	{
-		Stamina -= 30 * DeltaTime;
-	}
-	else if (Stamina < MaxStamina)
-	{
-		Stamina += 10 * DeltaTime;
-	}
+	float DeltaStamina = StaminaDrainRate * DeltaTime;
 
+	// Switch for the different behaviours and appearances of the stamina bar when Sprinting
+	if (MovementStatus != EMovementStatus::EMS_Crouching)
+	{
+		switch (StaminaStatus)
+		{
+		case EStaminaStatus::ESS_Normal:
+			if (bShiftKeyDown)
+			{
+				if (Stamina - DeltaStamina <= MinSprintStamina)
+				{
+					SetStaminaStatus(EStaminaStatus::ESS_BelowMinimum);
+					Stamina -= DeltaStamina;
+				}
+				else
+				{
+					Stamina -= DeltaStamina;
+				}
+				SetMovementStatus(EMovementStatus::EMS_Sprinting);
+			}
+			else
+			{
+				if (Stamina + DeltaStamina >= MaxStamina)
+				{
+					Stamina = MaxStamina;
+				}
+				else
+				{
+					Stamina += DeltaStamina;
+				}
+				SetMovementStatus(EMovementStatus::EMS_Walking);
+			}
+			break;
+
+		case EStaminaStatus::ESS_BelowMinimum:
+			if (bShiftKeyDown)
+			{
+				if (Stamina - DeltaStamina <= 0.f)
+				{
+					SetStaminaStatus(EStaminaStatus::ESS_Exhausted);
+					Stamina = 0.f;
+					SetMovementStatus(EMovementStatus::EMS_Walking);
+				}
+				else
+				{
+					Stamina -= DeltaStamina;
+					SetMovementStatus(EMovementStatus::EMS_Sprinting);
+				}
+			}
+			else
+			{
+				if (Stamina + DeltaStamina >= MinSprintStamina)
+				{
+					SetStaminaStatus(EStaminaStatus::ESS_Normal);
+					Stamina += DeltaStamina;
+				}
+				else
+				{
+					Stamina += DeltaStamina;
+				}
+				SetMovementStatus(EMovementStatus::EMS_Walking);
+			}
+			break;
+
+		case EStaminaStatus::ESS_Exhausted:
+			if (bShiftKeyDown)
+			{
+				Stamina = 0.f;
+			}
+			else
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_ExhaustedRecovering);
+				Stamina += DeltaStamina;
+			}
+			SetMovementStatus(EMovementStatus::EMS_Walking);
+			break;
+
+		case EStaminaStatus::ESS_ExhaustedRecovering:
+			if (Stamina + DeltaStamina >= MinSprintStamina)
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_Normal);
+				Stamina += DeltaStamina;
+			}
+			else
+			{
+				Stamina += DeltaStamina;
+			}
+			SetMovementStatus(EMovementStatus::EMS_Walking);
+			break;
+
+		default:
+			;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -120,8 +215,8 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Crouch);
 
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::Sprint);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::Sprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::ShiftKeyDown);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::ShiftKeyUp);
 
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::DodgeKeyDown);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::DodgeKeyUp);
@@ -160,60 +255,58 @@ void AMyMainCharacter::Look(const FInputActionValue& value)
 	AddControllerYawInput(LookAxisVector.X);
 }
 
-void AMyMainCharacter::Crouch()
+void AMyMainCharacter::SetMovementStatus(EMovementStatus Status)
 {
-	if (!bCrouching) {
-		
-		MovementStatus = EMovementStatus::EMS_Crouching;
-
-		bSprinting = false;
-		bCrouching = true;
-		
-		GetCharacterMovement()->MaxWalkSpeed = 200.f;
-		GetCapsuleComponent()->SetCapsuleSize(40.f, 70.f);
-
-		FVector MeshLocation(0.f, 5.f, -72.5f);
-		GetMesh()->SetRelativeLocation(MeshLocation); 
-		
+	MovementStatus = Status;
+	if (MovementStatus == EMovementStatus::EMS_Sprinting)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = SprintingSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("MovementStatus -> %s"), *UEnum::GetValueAsString(MovementStatus))
+		//GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
+		//FVector MeshLocation(0.f, 5.f, -90.5f);
+		//GetMesh()->SetRelativeLocation(MeshLocation);
+	}
+	else if (MovementStatus == EMovementStatus::EMS_Crouching)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CrouchingSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("MovementStatus -> %s"), *UEnum::GetValueAsString(MovementStatus))
+		//GetCapsuleComponent()->SetCapsuleSize(40.f, 70.f);
+		//FVector MeshLocation(0.f, 5.f, -72.5f);
+		//GetMesh()->SetRelativeLocation(MeshLocation);
 	}
 	else
 	{
-		MovementStatus = EMovementStatus::EMS_Walking;
-
-		bCrouching = false;
-		GetCharacterMovement()->MaxWalkSpeed = 400.f;
-		GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
-
-		FVector MeshLocation(0.f, 5.f, -90.5f);
-		GetMesh()->SetRelativeLocation(MeshLocation);
+		GetCharacterMovement()->MaxWalkSpeed = WalkingSpeed;
+		UE_LOG(LogTemp, Warning, TEXT("MovementStatus -> %s"), *UEnum::GetValueAsString(MovementStatus))
+		//GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
+		//FVector MeshLocation(0.f, 5.f, -90.5f);
+		//GetMesh()->SetRelativeLocation(MeshLocation);
 	}
-	
 }
 
-void AMyMainCharacter::Sprint()
+void AMyMainCharacter::Crouch()
 {
-	if (!bSprinting && Stamina > 0) {
-
-		MovementStatus = EMovementStatus::EMS_Sprinting;
-
-		bCrouching = false;
-		bSprinting = true;
-		GetCharacterMovement()->MaxWalkSpeed = 950.f;
-
-		if (Stamina <= 0) {
-			bSprinting = false;
-			GetCharacterMovement()->MaxWalkSpeed = 400.f;
-		}
-
+	bCrouching = !bCrouching;
+	if (bCrouching)
+	{
+		SetMovementStatus(EMovementStatus::EMS_Crouching);
 	}
 	else
 	{
-
-		MovementStatus = EMovementStatus::EMS_Walking;
-
-		bSprinting = false;
-		GetCharacterMovement()->MaxWalkSpeed = 400.f;
+		SetMovementStatus(EMovementStatus::EMS_Walking);
 	}
+		
+
+}
+
+void AMyMainCharacter::ShiftKeyDown()
+{
+	bShiftKeyDown = true;
+}
+
+void AMyMainCharacter::ShiftKeyUp()
+{
+	bShiftKeyDown = false;
 }
 
 void AMyMainCharacter::DoubleJump()

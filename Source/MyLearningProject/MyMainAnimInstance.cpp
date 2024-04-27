@@ -38,8 +38,6 @@ void UMyMainAnimInstance::UpdateAnimationProperties()
 			Main = Cast<AMyMainCharacter>(Pawn);
 		}
 		
-		bIsCrouching = Main->bCrouching;
-		bIsSprinting = Main->bSprinting;
 		bAnimHasDoubleJumped = Main->bHasDoubleJumped;
 		bHasDodged = Main->bPressedDodge;
 	}

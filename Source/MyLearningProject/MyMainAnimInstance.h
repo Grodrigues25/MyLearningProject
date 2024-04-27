@@ -28,9 +28,6 @@ public:
 	bool bIsInAir;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Movement")
-	bool bIsCrouching;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Movement")
 	bool bIsSprinting;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")

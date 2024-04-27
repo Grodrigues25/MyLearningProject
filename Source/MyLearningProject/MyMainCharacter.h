@@ -18,6 +18,18 @@ enum class EMovementStatus : uint8
 	EMS_Max UMETA(DisplayName = "DefaultMax")
 };
 
+UENUM(BlueprintType)
+enum class EStaminaStatus :uint8
+{
+	ESS_Normal UMETA(DisplayName = "Normal"),
+	ESS_BelowMinimum UMETA(DisplayName = "BelowMinumum"),
+	ESS_Exhausted UMETA(DisplayName = "Exhausted"),
+	ESS_ExhaustedRecovering UMETA(DisplayName = "ExhaustedRecovering"),
+
+	ESS_MAX UMETA(DisplayName = "DefaultMax")
+};
+
+// EnhancedInput
 class UInputMappingContext;
 class UInputAction;
 
@@ -30,32 +42,53 @@ public:
 	// Sets default values for this character's properties
 	AMyMainCharacter();
 
+	//ENUMS for character states and statuses
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	EMovementStatus MovementStatus;
 
-	// Variables related to character stats and metrics
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	float CharacterMovementSpeed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Custom Property -> Movement")
+	EStaminaStatus StaminaStatus;
 
+	FORCEINLINE void SetStaminaStatus(EStaminaStatus Status) { StaminaStatus = Status; }
+
+	// Set Movement and running speed
+	void SetMovementStatus(EMovementStatus Status);
+
+	// Variables related to character stats and metrics
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
 	float MaxHealth;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
 	float Health;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Stats | Movement")
 	float MaxStamina;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
 	float Stamina;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
+	float SprintingSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
+	float WalkingSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
+	float CrouchingSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
+	float StaminaDrainRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
+	float MinSprintStamina;
 
 	// Character related bools used for gameplay mechanics
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bSprinting;
-
+	bool bShiftKeyDown;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bIsInAir;
 
@@ -97,7 +130,9 @@ public:
 
 	void Crouch();
 
-	void Sprint();
+	void ShiftKeyDown();
+
+	void ShiftKeyUp();
 
 	void DoubleJump();
 
