@@ -82,12 +82,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Stats | Movement")
 	float MinSprintStamina;
 
+	//Variables for collectibles
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats | Coins")
+	int32 CoinTotal;
+
 	// Character related bools used for gameplay mechanics
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bCrouching;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
-	bool bShiftKeyDown;
+	bool bSprintKeyDown;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Custom Property -> Movement")
 	bool bIsInAir;
@@ -130,9 +134,9 @@ public:
 
 	void Crouch();
 
-	void ShiftKeyDown();
+	void SprintKeyDown();
 
-	void ShiftKeyUp();
+	void SprintKeyUp();
 
 	void DoubleJump();
 
@@ -144,6 +148,7 @@ public:
 
 	void Die();
 
+	void IncrementCoins();
 
 protected:
 	// Called when the game starts or when spawned

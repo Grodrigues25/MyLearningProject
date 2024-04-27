@@ -20,7 +20,7 @@
 AMyMainCharacter::AMyMainCharacter()
 {
 	// Bools related to Character Movement
-	bShiftKeyDown = false;
+	bSprintKeyDown = false;
 	bAttacking = false;
 	bCrouching = false;
 	bHasDoubleJumped = false;
@@ -44,6 +44,9 @@ AMyMainCharacter::AMyMainCharacter()
 	Stamina = 100.f;
 	StaminaDrainRate = 25.f;
 	MinSprintStamina = 50.f;
+
+	// Collectibles counter
+	CoinTotal = 0;
 
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -111,7 +114,7 @@ void AMyMainCharacter::Tick(float DeltaTime)
 		switch (StaminaStatus)
 		{
 		case EStaminaStatus::ESS_Normal:
-			if (bShiftKeyDown)
+			if (bSprintKeyDown)
 			{
 				if (Stamina - DeltaStamina <= MinSprintStamina)
 				{
@@ -139,7 +142,7 @@ void AMyMainCharacter::Tick(float DeltaTime)
 			break;
 
 		case EStaminaStatus::ESS_BelowMinimum:
-			if (bShiftKeyDown)
+			if (bSprintKeyDown)
 			{
 				if (Stamina - DeltaStamina <= 0.f)
 				{
@@ -169,7 +172,7 @@ void AMyMainCharacter::Tick(float DeltaTime)
 			break;
 
 		case EStaminaStatus::ESS_Exhausted:
-			if (bShiftKeyDown)
+			if (bSprintKeyDown)
 			{
 				Stamina = 0.f;
 			}
@@ -215,8 +218,8 @@ void AMyMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::Crouch);
 
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::ShiftKeyDown);
-		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::ShiftKeyUp);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AMyMainCharacter::SprintKeyDown);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::SprintKeyUp);
 
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &AMyMainCharacter::DodgeKeyDown);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Canceled, this, &AMyMainCharacter::DodgeKeyUp);
@@ -262,25 +265,25 @@ void AMyMainCharacter::SetMovementStatus(EMovementStatus Status)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = SprintingSpeed;
 		UE_LOG(LogTemp, Warning, TEXT("MovementStatus -> %s"), *UEnum::GetValueAsString(MovementStatus))
-		//GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
-		//FVector MeshLocation(0.f, 5.f, -90.5f);
-		//GetMesh()->SetRelativeLocation(MeshLocation);
+		GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
+		FVector MeshLocation(0.f, 5.f, -90.5f);
+		GetMesh()->SetRelativeLocation(MeshLocation);
 	}
 	else if (MovementStatus == EMovementStatus::EMS_Crouching)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = CrouchingSpeed;
 		UE_LOG(LogTemp, Warning, TEXT("MovementStatus -> %s"), *UEnum::GetValueAsString(MovementStatus))
-		//GetCapsuleComponent()->SetCapsuleSize(40.f, 70.f);
-		//FVector MeshLocation(0.f, 5.f, -72.5f);
-		//GetMesh()->SetRelativeLocation(MeshLocation);
+		GetCapsuleComponent()->SetCapsuleSize(40.f, 70.f);
+		FVector MeshLocation(0.f, 5.f, -72.5f);
+		GetMesh()->SetRelativeLocation(MeshLocation);
 	}
 	else
 	{
 		GetCharacterMovement()->MaxWalkSpeed = WalkingSpeed;
 		UE_LOG(LogTemp, Warning, TEXT("MovementStatus -> %s"), *UEnum::GetValueAsString(MovementStatus))
-		//GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
-		//FVector MeshLocation(0.f, 5.f, -90.5f);
-		//GetMesh()->SetRelativeLocation(MeshLocation);
+		GetCapsuleComponent()->SetCapsuleSize(30.f, 90.f);
+		FVector MeshLocation(0.f, 5.f, -90.5f);
+		GetMesh()->SetRelativeLocation(MeshLocation);
 	}
 }
 
@@ -299,14 +302,14 @@ void AMyMainCharacter::Crouch()
 
 }
 
-void AMyMainCharacter::ShiftKeyDown()
+void AMyMainCharacter::SprintKeyDown()
 {
-	bShiftKeyDown = true;
+	bSprintKeyDown = true;
 }
 
-void AMyMainCharacter::ShiftKeyUp()
+void AMyMainCharacter::SprintKeyUp()
 {
-	bShiftKeyDown = false;
+	bSprintKeyDown = false;
 }
 
 void AMyMainCharacter::DoubleJump()
@@ -357,4 +360,9 @@ void AMyMainCharacter::DecrementHealth(float Amount)
 void AMyMainCharacter::Die()
 {
 
+}
+
+void AMyMainCharacter::IncrementCoins()
+{
+	CoinTotal++;
 }
