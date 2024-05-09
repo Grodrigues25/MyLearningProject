@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "MyTestCharacter.generated.h"
+#include "GameFramework/Pawn.h"
+#include "Enemy.generated.h"
 
 UCLASS()
-class MYLEARNINGPROJECT_API AMyTestCharacter : public ACharacter
+class MYLEARNINGPROJECT_API AEnemy : public APawn
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	AMyTestCharacter();
+	// Sets default values for this pawn's properties
+	AEnemy();
 
 protected:
 	// Called when the game starts or when spawned
